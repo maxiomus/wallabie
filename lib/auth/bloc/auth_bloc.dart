@@ -8,7 +8,12 @@ import 'package:august_chat/repositories/auth_repository.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
 
+/// Bloc that manages authentication state across the application.
+///
+/// Listens to Firebase Auth state changes and emits corresponding
+/// [AuthState] updates (authenticated, unauthenticated, or unknown).
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  /// Creates an [AuthBloc] with the given [AuthRepository].
   AuthBloc(this._repo) : super(const AuthState.unknown()) {
     on<AuthUserChanged>(_onUserChanged);
 

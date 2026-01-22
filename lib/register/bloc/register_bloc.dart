@@ -6,11 +6,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 part 'register_event.dart';
 part 'register_state.dart';
 
+/// Bloc that handles user registration form submission.
+///
+/// Validates input fields and creates new user accounts via [AuthRepository].
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
+  /// Creates a [RegisterBloc] with the required [AuthRepository].
   RegisterBloc({
     required AuthRepository authRepo,
   }) : _authRepo = authRepo,
-    super(const RegisterState()) {    
+    super(const RegisterState()) {
 
     on<RegisterSubmitEvent>(_onSubmit);
   }

@@ -1,41 +1,76 @@
 part of 'user_profile_bloc.dart';
 
-enum UserProfileLoadStatus { idle, loading, loaded, failure }
-enum UserProfileSaveStatus { idle, saving, saved, failure }
+/// Status of preference loading from Firestore/cache.
+enum UserProfileLoadStatus {
+  /// Initial state, loading not started.
+  idle,
 
+  /// Preferences are being loaded.
+  loading,
+
+  /// Preferences loaded successfully.
+  loaded,
+
+  /// Failed to load preferences.
+  failure,
+}
+
+/// Status of preference saving to Firestore.
+enum UserProfileSaveStatus {
+  /// No save in progress.
+  idle,
+
+  /// Save is in progress.
+  saving,
+
+  /// Save completed successfully.
+  saved,
+
+  /// Save failed.
+  failure,
+}
+
+/// State of the user profile with preferences and sync status.
 final class UserProfileState extends Equatable {
+  /// Creates a [UserProfileState] with required fields.
   const UserProfileState({
     required this.userId,
-    //required this.userName,
     required this.preference,
-    this.loadStatus = UserProfileLoadStatus.idle,    
+    this.loadStatus = UserProfileLoadStatus.idle,
     this.saveStatus = UserProfileSaveStatus.idle,
     this.errorMessage,
     this.lastSyncedAt,
     this.isFromCache = false,
   });
 
-  // Auth user id (from AppBloc → injected into bloc)
+  /// Auth user ID from Firebase Auth.
   final String userId;
-  // Snapshot of auth displayName at initialization
-  // (identity still belongs to FirebaseAuth)
-  // final String userName;
+
+  /// Current user preferences.
   final UserPreference preference;
 
+  /// Current loading status.
   final UserProfileLoadStatus loadStatus;
+
+  /// Current save status.
   final UserProfileSaveStatus saveStatus;
 
+  /// Error message if load or save failed.
   final String? errorMessage;
 
-  // When we last successfully wrote to Firestore (or confirmed stream update)
+  /// Timestamp of last successful Firestore sync.
   final DateTime? lastSyncedAt;
-  
-  // True if current preference originated from local cache (before Firestore catches up)
+
+  /// True if preferences are from local cache (before Firestore sync).
   final bool isFromCache;
 
+  /// Returns true if preferences are currently loading.
   bool get isLoading => loadStatus == UserProfileLoadStatus.loading;
+
+  /// Returns true if preferences are currently being saved.
   bool get isSaving => saveStatus == UserProfileSaveStatus.saving;
 
+  /// Creates a copy of this state with the given fields replaced.
   UserProfileState copyWith({
     UserPreference? preference,
     UserProfileLoadStatus? loadStatus,
@@ -46,7 +81,6 @@ final class UserProfileState extends Equatable {
   }) {
     return UserProfileState(
       userId: userId,
-      //userName: userName,
       preference: preference ?? this.preference,
       loadStatus: loadStatus ?? this.loadStatus,
       saveStatus: saveStatus ?? this.saveStatus,
@@ -56,8 +90,7 @@ final class UserProfileState extends Equatable {
     );
   }
 
-  @override  
-  //List<Object?> get props => [darkMode, store];
+  @override
   List<Object?> get props => [
     userId,
     preference,

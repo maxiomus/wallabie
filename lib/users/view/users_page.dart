@@ -6,7 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../bloc/users_bloc.dart';
 
+/// Page displaying all users for starting new direct chats.
+///
+/// Tapping a user creates or opens a direct chat room with them.
 class UsersPage extends StatelessWidget {
+  /// Creates a [UsersPage].
   const UsersPage({super.key});
 
   @override
@@ -62,11 +66,14 @@ class UsersPage extends StatelessWidget {
     );
   }
 
+  /// Generates a deterministic room ID for a direct chat between two users.
+  ///
+  /// Sorts the UIDs to ensure the same ID regardless of order.
   String directRoomId(String uidA, String uidB) {
     final a = uidA.trim();
     final b = uidB.trim();
     if (a.isEmpty || b.isEmpty) throw ArgumentError('uid cannot be empty');
-    final sorted = [a, b]..sort(); // deterministic
+    final sorted = [a, b]..sort();
     return 'direct_${sorted[0]}_${sorted[1]}';
   }
 }

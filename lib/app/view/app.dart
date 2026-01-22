@@ -1,37 +1,31 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-//import 'package:flutter/rendering.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:firebase_ui_localizations/firebase_ui_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-//import 'package:august_chat/users/view/users_page.dart';
-//import 'package:august_chat/login/bloc/login_bloc.dart';
-//import 'package:august_chat/repositories/auth_repository.dart';
-//import 'package:august_chat/rooms/view/rooms_page.dart';
-//import 'package:august_chat/app/theme_provider.dart';
-
 import 'package:august_chat/app/theme_provider.dart';
-//import '../../auth/bloc/auth_bloc.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../home/view/home_page.dart';
-//import '../../login/view/view.dart';
 import '../../repositories/profile_repostory.dart';
 import '../localeProvider.dart';
 import '../user_profile/bloc/user_profile_bloc.dart';
 import '../../theme.dart';
 
-//import 'rooms_page.dart';
-
+/// Root application widget that handles authentication routing.
+///
+/// Shows sign-in screen when unauthenticated, home screen when authenticated.
+/// Sets up blocs and providers for the authenticated app.
 class App extends StatelessWidget {
+  /// Creates the [App] widget with required OAuth client ID.
   const App({super.key, required this.clientId});
 
+  /// Google OAuth client ID for authentication.
   final String clientId;
 
   @override
@@ -124,10 +118,12 @@ class App extends StatelessWidget {
   }
 }
 
+/// The main application view with MaterialApp configuration.
+///
+/// Applies theme, locale, and localization settings based on user preferences.
 class AppView extends StatelessWidget {
+  /// Creates the [AppView] widget.
   const AppView({super.key});
-
-  //final ThemeMode themeMode;
 
   @override
   Widget build(BuildContext context) {
@@ -173,6 +169,7 @@ class AppView extends StatelessWidget {
   }
 }
 
+/// Parses a locale tag string into a [Locale] object.
 Locale _parseLocale(String tag) {
   final parts = tag.split(RegExp('[-_]'));
   return parts.length == 1 ? Locale(parts[0]) : Locale(parts[0], parts[1]);

@@ -143,7 +143,12 @@ class LogInWithGoogleFailure implements Exception {
 /// Thrown during the logout process if a failure occurs.
 class LogOutFailure implements Exception {}
 
+/// Repository for Firebase Authentication operations.
+///
+/// Handles email/password authentication and manages user documents
+/// in Firestore for chat profile data.
 class AuthRepository {
+  /// Creates an [AuthRepository] with optional dependencies for testing.
   AuthRepository({
     FirebaseAuth? firebaseAuth,
     FirebaseFirestore? firestore,
@@ -154,8 +159,15 @@ class AuthRepository {
   final FirebaseAuth _auth;
   final FirebaseFirestore _db;
 
+  /// Streams authentication state changes.
+  ///
+  /// Emits the current user when signed in, null when signed out.
   Stream<User?> authStateChanges() => _auth.authStateChanges();
 
+  /// Registers a new user with email and password.
+  ///
+  /// Creates both a Firebase Auth account and a Firestore user document
+  /// for chat profile data.
   Future<User> registerWithEmail({
     required String email,
     required String password,
@@ -183,6 +195,9 @@ class AuthRepository {
     return user;
   }
 
+  /// Signs in a user with email and password.
+  ///
+  /// Ensures the user document exists in Firestore, creating it if needed.
   Future<User> signInWithEmail({
     required String email,
     required String password,
@@ -219,5 +234,6 @@ class AuthRepository {
     return cred.user!;
   }
 
+  /// Signs out the current user.
   Future<void> signOut() => _auth.signOut();
 }

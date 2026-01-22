@@ -1,6 +1,14 @@
+/// Application theme definitions for light and dark modes.
+///
+/// Uses Google Fonts (Open Sans) and Material Design 3 color schemes.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Light theme configuration for the application.
+///
+/// Features black text on white surfaces with Open Sans typography.
 final theme = ThemeData(
   
   textTheme: GoogleFonts.openSansTextTheme().apply(
@@ -34,6 +42,9 @@ final theme = ThemeData(
   ),
 );
 
+/// Dark theme configuration for the application.
+///
+/// Features white text on dark surfaces with Open Sans typography.
 final darkTheme = ThemeData(
   textTheme: GoogleFonts.openSansTextTheme().apply(
     bodyColor: Colors.white,

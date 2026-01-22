@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
+/// A custom animated toggle switch for theme mode selection.
+///
+/// Displays sun/moon icons with a sliding circle animation.
 class CustomThemeSwitch extends StatelessWidget {
+  /// Whether dark mode is currently enabled.
   final bool isDarkMode;
+
+  /// Callback when the switch is toggled.
   final ValueChanged<bool> onToggle;
 
+  /// Creates a [CustomThemeSwitch] with required parameters.
   const CustomThemeSwitch({
     super.key,
     required this.isDarkMode,

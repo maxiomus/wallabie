@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'home_view.dart';
 
+/// Main home page container with animated background color transitions.
 class HomePage extends StatefulWidget {
+  /// Creates a [HomePage].
   const HomePage({super.key});
 
+  /// Creates a [MaterialPage] containing the [HomePage].
   static Page<void> page() => const MaterialPage<void>(child: HomePage());
 
   @override

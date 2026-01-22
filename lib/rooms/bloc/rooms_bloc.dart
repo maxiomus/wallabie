@@ -11,7 +11,12 @@ import 'package:august_chat/repositories/chat_repository.dart';
 part 'rooms_event.dart';
 part 'rooms_state.dart';
 
+/// Bloc that manages the list of chat rooms for the current user.
+///
+/// Combines real-time room data with user data to display room names
+/// (using the other user's name for direct chats).
 class RoomsBloc extends Bloc<RoomsEvent, RoomsState> {
+  /// Creates a [RoomsBloc] with required repositories.
   RoomsBloc({
     required ChatRepository chatRepo,
     required UserRepository userRepo,
@@ -19,10 +24,10 @@ class RoomsBloc extends Bloc<RoomsEvent, RoomsState> {
   })
     : _chatRepo = chatRepo,
       _userRepo = userRepo,
-      _myUid = (auth ?? FirebaseAuth.instance).currentUser!.uid, 
+      _myUid = (auth ?? FirebaseAuth.instance).currentUser!.uid,
       super(const RoomsState()) {
 
-    on<RoomsStartEvent>(_onStart);    
+    on<RoomsStartEvent>(_onStart);
   }
 
   final ChatRepository _chatRepo;

@@ -6,7 +6,11 @@ import '../cubit/home_cubit.dart';
 import '../../users/users.dart';
 import '../../rooms/rooms.dart';
 
+/// The main home view with bottom navigation and tab content.
+///
+/// Displays Users, Rooms, or Profile based on selected tab.
 class HomeView extends StatelessWidget {
+  /// Creates a [HomeView].
   const HomeView({super.key});
 
   @override

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -6,9 +5,11 @@ import 'package:august_chat/rooms/view/rooms_page.dart';
 
 import '../register.dart';
 
-//import 'rooms_page.dart';
-
+/// Registration page for creating new user accounts.
+///
+/// Collects display name, email, and password for account creation.
 class RegisterPage extends StatefulWidget {
+  /// Creates a [RegisterPage].
   const RegisterPage({super.key});
 
   @override

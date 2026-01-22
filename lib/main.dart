@@ -1,4 +1,10 @@
 
+/// August Chat (Wallabie) - Main application entry point.
+///
+/// Initializes Firebase and sets up the repository layer before
+/// launching the Flutter application.
+library;
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,8 +20,12 @@ import 'package:provider/provider.dart';
 import 'app/theme_provider.dart';
 //import 'package:august_chat/auth/bloc/auth_bloc.dart';
 
+/// Google OAuth client ID for authentication.
 const clientId = '961092907782-6n40v5fmkc1bap5cck1uv42cjksmf2u4.apps.googleusercontent.com';
 
+/// Application entry point.
+///
+/// Initializes Flutter bindings and Firebase before running the app.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -25,9 +35,17 @@ void main() async {
   runApp(const MainApp(clientId: clientId));
 }
 
+/// Root widget that provides repositories to the widget tree.
+///
+/// Sets up [MultiRepositoryProvider] with all data repositories and
+/// wraps the [App] widget for dependency injection throughout the app.
 class MainApp extends StatelessWidget {
+  /// Creates the main application widget.
+  ///
+  /// [clientId] is required for Google OAuth authentication.
   const MainApp({super.key, required this.clientId});
 
+  /// Google OAuth client ID for authentication.
   final String clientId;
 
   @override

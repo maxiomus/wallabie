@@ -5,7 +5,11 @@ import 'package:august_chat/repositories/auth_repository.dart';
 import 'package:august_chat/register/register.dart';
 import 'package:august_chat/login/login.dart';
 
+/// Login page with email/password form.
+///
+/// Provides navigation to registration page for new users.
 class LoginPage extends StatefulWidget {
+  /// Creates a [LoginPage].
   const LoginPage({super.key});
 
   @override

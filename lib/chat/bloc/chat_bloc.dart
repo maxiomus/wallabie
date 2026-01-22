@@ -7,24 +7,29 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 
 import 'package:flutter_chat_core/flutter_chat_core.dart';
-//import 'package:flutter_chat_types/flutter_chat_types.dart';
 
 part 'chat_event.dart';
 part 'chat_state.dart';
 
+/// Bloc that manages a single chat conversation.
+///
+/// Handles real-time message streaming, sending messages, and user resolution
+/// for the chat UI. Uses [InMemoryChatController] for the flutter_chat_ui package.
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
+  /// Creates a [ChatBloc] for the given [roomId].
   ChatBloc({required this.roomId})
     : _myUid = FirebaseAuth.instance.currentUser!.uid,
       chatController = InMemoryChatController(),
       super(const ChatState()) {
     on<ChatStartEvent>(_onStart);
   }
-  
+
+  /// The ID of the chat room this bloc manages.
   final String roomId;
   final String _myUid;
-  
-  final InMemoryChatController chatController;  
-  //StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
+
+  /// Controller for the flutter_chat_ui widget.
+  final InMemoryChatController chatController;
 
   Future<void> _onStart(
     ChatStartEvent event,
@@ -97,6 +102,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       */
   }
 
+  /// Converts a Firestore document to a [TextMessage].
   Message _docToMessage(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
     final d = doc.data();
     final createdAtTs = d['createdAt'];
@@ -110,6 +116,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     );
   }
 
+  /// Resolves a user ID to a [User] object for the chat UI.
+  ///
+  /// Fetches user data from Firestore to display name and avatar.
   Future<User> resolveUser(UserID id) async {
     final snap = await FirebaseFirestore.instance.collection('users').doc(id).get();
     final data = snap.data();
@@ -120,6 +129,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     );
   }
 
+  /// Sends a text message to the chat room.
+  ///
+  /// Optimistically inserts the message into the UI, then commits
+  /// to Firestore with a batch write (message + room metadata).
   Future<void> sendText(String text) async {
     final msgRef = FirebaseFirestore.instance
         .collection('rooms')
@@ -156,11 +169,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     await batch.commit();
   }
   
+  /// Returns the current user's ID for distinguishing sent/received messages.
   String get currentUserId => _myUid;
 
   @override
   Future<void> close() async {
-    //await _sub?.cancel();
     chatController.dispose();
     return super.close();
   }

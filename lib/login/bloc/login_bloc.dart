@@ -6,7 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 part 'login_event.dart';
 part 'login_state.dart';
 
+/// Bloc that handles the login form submission and authentication.
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
+  /// Creates a [LoginBloc] with the required [AuthRepository].
   LoginBloc({
     required AuthRepository authRepo,
   }) : _authRepo = authRepo,
@@ -15,7 +17,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginSubmitEvent>(_onSubmit);
   }
 
-  AuthRepository _authRepo;
+  final AuthRepository _authRepo;
 
   Future<void> _onSubmit(
     LoginSubmitEvent event,

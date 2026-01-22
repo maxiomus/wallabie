@@ -1,15 +1,16 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-//import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-//import '../models/user_preference.dart';
 import '../widgets/widgets.dart';
 import '../bloc/user_profile_bloc.dart';
 
+/// Page displaying user profile with settings for theme and locale.
+///
+/// Allows users to toggle dark mode, change language, and sign out.
 class UserProfilePage extends StatelessWidget {
-  const UserProfilePage({super.key});  
+  /// Creates a [UserProfilePage].
+  const UserProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,13 +5,16 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
 
 part 'users_event.dart';
 part 'users_state.dart';
 
+/// Bloc that manages the list of all users for user selection screens.
+///
+/// Streams user data in real-time for displaying in user picker interfaces.
 class UsersBloc extends Bloc<UsersEvent, UsersState> {
-  UsersBloc(this._repo) 
+  /// Creates a [UsersBloc] with the given [ChatRepository].
+  UsersBloc(this._repo)
     : _myUid = FirebaseAuth.instance.currentUser!.uid,
       super(const UsersState()) {
 

@@ -1,4 +1,3 @@
-
 import 'package:august_chat/chat/view/chat_page.dart';
 import 'package:august_chat/repositories/user_repository.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +10,12 @@ import 'package:august_chat/group/create_group_page.dart';
 import 'package:august_chat/repositories/chat_repository.dart';
 import '../bloc/rooms_bloc.dart';
 
-
-//import 'create_group_page.dart';
-
-// import 'chat_page.dart'; // plug your ChatPage here
-
+/// Page displaying the list of chat rooms the user belongs to.
+///
+/// Shows both direct (1-on-1) and group chats with last message preview.
 class RoomsPage extends StatelessWidget {
-  const RoomsPage({super.key});  
+  /// Creates a [RoomsPage].
+  const RoomsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

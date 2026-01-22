@@ -6,7 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:august_chat/repositories/chat_repository.dart';
 import '../users/users.dart';
 
+/// Page for creating a new group chat.
+///
+/// Allows naming the group and selecting members from the user list.
 class CreateGroupPage extends StatefulWidget {
+  /// Creates a [CreateGroupPage].
   const CreateGroupPage({super.key});
 
   @override

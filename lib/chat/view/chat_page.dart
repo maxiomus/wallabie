@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
@@ -6,26 +5,54 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 import 'package:august_chat/chat/bloc/chat_bloc.dart';
-//import 'package:august_chat/app/user_profile/bloc/user_profile_bloc.dart';
 import '../../app/theme_provider.dart';
 
+/// Kakao-style yellow color for sent messages.
 const kakaoYellow = Color(0xFFFEE500);
+
+/// Kakao-style background color for the chat.
 const kakaoChatBg = Color(0xffbacee0);
+
+/// Background color for incoming messages.
 const kakaoIncoming = Colors.white;
+
+/// Background color for outgoing messages.
 const kakaoOutgoing = kakaoYellow;
+
+/// Text color on yellow background.
 const kakaoTextOnYellow = Color(0xFF1A1A1A);
 
+/// Chat conversation page with Kakao-style UI.
+///
+/// Supports text messaging, emoji picker, stickers, and attachments.
 class ChatPage extends StatefulWidget {
+  /// Creates a [ChatPage] for the given room.
   const ChatPage({super.key, required this.roomId, this.title});
 
+  /// The ID of the chat room.
   final String roomId;
+
+  /// Optional title for the app bar.
   final String? title;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
 
-enum InputPanel { none, emoji, sticker, attach }
+/// Types of input panels that can be shown above the composer.
+enum InputPanel {
+  /// No panel shown.
+  none,
+
+  /// Emoji picker panel.
+  emoji,
+
+  /// Sticker selection panel.
+  sticker,
+
+  /// Attachment options panel.
+  attach,
+}
 
 class _ChatPageState extends State<ChatPage> {  
   ChatBloc? _bloc;

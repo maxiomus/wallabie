@@ -11,11 +11,16 @@ import '../models/user_preference.dart';
 part 'user_profile_event.dart';
 part 'user_profile_state.dart';
 
+/// Bloc that manages user preferences with offline-first sync.
+///
+/// Loads preferences from local cache first for instant UI, then syncs
+/// with Firestore. Changes are debounced before persisting to reduce writes.
 class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   final ProfileRepository _profileRepository;
   StreamSubscription<UserPreference>? _sub;
   Timer? _debounce;
-  
+
+  /// Creates a [UserProfileBloc] for the given Firebase [user].
   UserProfileBloc({
     required User user,
     required ProfileRepository profileRepository,

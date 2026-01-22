@@ -1,12 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Repository for chat-related Firestore operations.
+///
+/// Handles rooms (direct and group), messages, and real-time streaming.
+/// Uses batch writes to ensure atomic message + room metadata updates.
 class ChatRepository {
+  /// Creates a [ChatRepository] with optional Firestore instance for testing.
   ChatRepository({FirebaseFirestore? firestore})
       : _db = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _db;
 
-  // ----- Rooms stream (inbox)
+  /// Streams all rooms where the user is a member.
+  ///
+  /// Returns real-time updates whenever rooms change.
   Stream<QuerySnapshot<Map<String, dynamic>>> roomsStreamForUser(String uid) {
     return _db
       .collection('rooms')
@@ -15,15 +22,21 @@ class ChatRepository {
       .snapshots();
   }
 
-  // ----- Users stream
+  /// Streams all users ordered by name.
   Stream<QuerySnapshot<Map<String, dynamic>>> usersStream() {
     return _db.collection('users').orderBy('name').snapshots();
   }
 
-  // ----- Create (or ensure) direct room (deterministic id)
+  /// Creates or ensures a direct (1-on-1) room exists.
+  ///
+  /// Uses a deterministic [roomId] based on sorted user IDs to prevent
+  /// duplicate rooms. Creates the room if it doesn't exist, otherwise
+  /// updates the timestamp.
+  ///
+  /// [memberIds] must contain exactly 2 user IDs.
   Future<DocumentReference<Map<String, dynamic>>> ensureDirectRoom({
     required String roomId,
-    required List<String> memberIds, // must be length 2
+    required List<String> memberIds,
   }) async {
     final ref = _db.collection('rooms').doc(roomId);
 
@@ -51,7 +64,10 @@ class ChatRepository {
     return ref;
   }
 
-  // ----- Create group room (random id)
+  /// Creates a new group chat room with a random Firestore-generated ID.
+  ///
+  /// [name] is the display name for the group.
+  /// [memberIds] contains all user IDs to include in the group.
   Future<DocumentReference<Map<String, dynamic>>> createGroupRoom({
     required String name,
     required List<String> memberIds,
@@ -70,7 +86,7 @@ class ChatRepository {
     return ref;
   }
 
-  // ----- Messages stream (for Chat controller)
+  /// Streams messages for a room, ordered by creation time (newest first).
   Stream<QuerySnapshot<Map<String, dynamic>>> messagesStream(String roomId) {
     return _db
         .collection('rooms')
@@ -80,7 +96,10 @@ class ChatRepository {
         .snapshots();
   }
 
-  // ----- Send text message
+  /// Sends a text message and updates room metadata atomically.
+  ///
+  /// Uses a batch write to ensure the message and room's last message
+  /// info are updated together.
   Future<void> sendTextMessage({
     required String roomId,
     required String authorId,
