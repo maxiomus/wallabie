@@ -1,0 +1,62 @@
+{
+  "@@locale": "en",
+
+  "signOut": "Sign Out",
+  "signOutConfirmTitle": "Sign Out",
+  "signOutConfirmMessage": "Are you sure you want to sign out?",
+  "cancel": "Cancel",
+
+  "appearance": "Appearance",
+  "darkMode": "Dark Mode",
+  "on": "On",
+  "off": "Off",
+  "language": "Language",
+  "selectLanguage": "Select Language",
+
+  "notifications": "Notifications",
+  "pushNotifications": "Push Notifications",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "notificationHistory": "Notification History",
+  "viewPastNotifications": "View past notifications",
+  "markAllRead": "Mark all read",
+  "noNotifications": "No notifications",
+  "failedToLoadNotifications": "Failed to load notifications",
+  "timeNow": "now",
+
+  "about": "About",
+  "aboutAppName": "About August Chat",
+  "version": "Version {version}",
+  "@version": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "appDescription": "A modern chat application built with Flutter.",
+
+  "rooms": "Rooms",
+  "newDirectChat": "New 1-on-1",
+  "newGroup": "New group",
+  "noChatsYet": "No chats yet. Start one!",
+  "failedToLoadRooms": "Failed to load rooms",
+
+  "users": "Users",
+  "failedToLoadUsers": "Failed to load users",
+
+  "createGroup": "New Group",
+  "groupName": "Group name",
+  "groupNameRequired": "Group name required",
+  "selectAtLeastOneMember": "Select at least 1 member",
+
+  "message": "Message",
+  "chatError": "Chat error",
+  "gallery": "Gallery",
+  "camera": "Camera",
+  "file": "File",
+  "location": "Location",
+  "voiceRecordingNotImplemented": "Voice recording not yet implemented",
+
+  "welcomeSignIn": "Welcome to Wallabie, please sign in!",
+  "welcomeSignUp": "Welcome to Wallabie, please sign up!",
+  "termsAgreement": "By signing in, you agree to our terms and conditions."
+}

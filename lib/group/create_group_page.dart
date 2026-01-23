@@ -1,4 +1,5 @@
 import 'package:august_chat/chat/view/chat_page.dart';
+import 'package:august_chat/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -29,6 +30,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final repo = context.read<ChatRepository>();
     final myUid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -36,7 +38,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
       create: (_) => UsersBloc(repo)..add(UsersStartEvent()),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('New Group'),
+          title: Text(l10n.createGroup),
           actions: [
             IconButton(
               icon: const Icon(Icons.check),
@@ -44,13 +46,13 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                 final name = _name.text.trim();
                 if (name.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Group name required')),
+                    SnackBar(content: Text(l10n.groupNameRequired)),
                   );
                   return;
                 }
                 if (_selected.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Select at least 1 member')),
+                    SnackBar(content: Text(l10n.selectAtLeastOneMember)),
                   );
                   return;
                 }
@@ -74,7 +76,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
               padding: const EdgeInsets.all(12),
               child: TextField(
                 controller: _name,
-                decoration: const InputDecoration(labelText: 'Group name'),
+                decoration: InputDecoration(labelText: l10n.groupName),
               ),
             ),
             const Divider(height: 1),
@@ -85,7 +87,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (state.status == UsersStatus.failure) {
-                    return Center(child: Text(state.errorMessage ?? 'Failed to load users'));
+                    return Center(child: Text(state.errorMessage ?? l10n.failedToLoadUsers));
                   }
 
                   return ListView.separated(

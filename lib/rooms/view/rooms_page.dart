@@ -1,4 +1,5 @@
 import 'package:august_chat/chat/view/chat_page.dart';
+import 'package:august_chat/l10n/app_localizations.dart';
 import 'package:august_chat/repositories/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,14 +22,16 @@ class RoomsPage extends StatelessWidget {
     final repo = context.read<ChatRepository>();
     final userRepo = context.read<UserRepository>();
 
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocProvider(
       create: (_) => RoomsBloc(chatRepo: repo, userRepo: userRepo)..add(RoomsStartEvent()),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Rooms'),
+          title: Text(l10n.rooms),
           actions: [
             IconButton(
-              tooltip: 'New 1-on-1',
+              tooltip: l10n.newDirectChat,
               icon: const Icon(Icons.chat_bubble_outline),
               onPressed: () {
                 Navigator.of(context).push(
@@ -37,7 +40,7 @@ class RoomsPage extends StatelessWidget {
               },
             ),
             IconButton(
-              tooltip: 'New group',
+              tooltip: l10n.newGroup,
               icon: const Icon(Icons.group_add_outlined),
               onPressed: () {
                 Navigator.of(context).push(
@@ -53,12 +56,12 @@ class RoomsPage extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (state.status == RoomsStatus.failure) {
-              return Center(child: Text(state.errorMessage ?? 'Failed to load rooms'));
+              return Center(child: Text(state.errorMessage ?? l10n.failedToLoadRooms));
             }
 
             final rooms = state.rooms;
             if (rooms.isEmpty) {
-              return const Center(child: Text('No chats yet. Start one!'));
+              return Center(child: Text(l10n.noChatsYet));
             }
 
             return ListView.separated(

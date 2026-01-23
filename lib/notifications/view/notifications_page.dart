@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:august_chat/l10n/app_localizations.dart';
 import '../bloc/notifications_bloc.dart';
 
 /// Page displaying user notifications.
@@ -15,11 +16,13 @@ class NotificationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocProvider(
       create: (_) => NotificationsBloc()..add(const NotificationsStarted()),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Notifications'),
+          title: Text(l10n.notifications),
           actions: [
             BlocBuilder<NotificationsBloc, NotificationsState>(
               builder: (context, state) {
@@ -30,7 +33,7 @@ class NotificationsPage extends StatelessWidget {
                         .read<NotificationsBloc>()
                         .add(const AllNotificationsMarkedAsRead());
                   },
-                  child: const Text('Mark all read'),
+                  child: Text(l10n.markAllRead),
                 );
               },
             ),
@@ -43,13 +46,13 @@ class NotificationsPage extends StatelessWidget {
             }
             if (state.status == NotificationsStatus.failure) {
               return Center(
-                child: Text(state.errorMessage ?? 'Failed to load notifications'),
+                child: Text(state.errorMessage ?? l10n.failedToLoadNotifications),
               );
             }
 
             final notifications = state.notifications;
             if (notifications.isEmpty) {
-              return const Center(child: Text('No notifications'));
+              return Center(child: Text(l10n.noNotifications));
             }
 
             return ListView.separated(
@@ -75,7 +78,8 @@ class _NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final timeAgo = _formatTimeAgo(notification.createdAt);
+    final l10n = AppLocalizations.of(context)!;
+    final timeAgo = _formatTimeAgo(notification.createdAt, l10n);
 
     return ListTile(
       leading: CircleAvatar(
@@ -114,11 +118,11 @@ class _NotificationTile extends StatelessWidget {
     );
   }
 
-  String _formatTimeAgo(DateTime dateTime) {
+  String _formatTimeAgo(DateTime dateTime, AppLocalizations l10n) {
     final diff = DateTime.now().difference(dateTime);
     if (diff.inDays > 0) return '${diff.inDays}d';
     if (diff.inHours > 0) return '${diff.inHours}h';
     if (diff.inMinutes > 0) return '${diff.inMinutes}m';
-    return 'now';
+    return l10n.timeNow;
   }
 }

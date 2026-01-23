@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:august_chat/l10n/app_localizations.dart';
 import 'package:august_chat/notifications/notifications.dart';
 import '../widgets/widgets.dart';
 import '../bloc/user_profile_bloc.dart';
@@ -72,49 +73,54 @@ class UserProfilePage extends StatelessWidget {
 
               // Settings Sections
               SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
+                child: Builder(
+                  builder: (context) {
+                    final l10n = AppLocalizations.of(context)!;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
 
-                    // Appearance Section
-                    _SectionHeader(title: 'Appearance'),
-                    _buildThemeTile(context, pref),
-                    _buildLocaleTile(context, pref),
-                    const Divider(height: 32),
+                        // Appearance Section
+                        _SectionHeader(title: l10n.appearance),
+                        _buildThemeTile(context, pref),
+                        _buildLocaleTile(context, pref),
+                        const Divider(height: 32),
 
-                    // Notifications Section
-                    _SectionHeader(title: 'Notifications'),
-                    _buildNotificationsTile(context, pref),
-                    _buildNotificationsListTile(context),
-                    const Divider(height: 32),
+                        // Notifications Section
+                        _SectionHeader(title: l10n.notifications),
+                        _buildNotificationsTile(context, pref),
+                        _buildNotificationsListTile(context),
+                        const Divider(height: 32),
 
-                    // About Section
-                    _SectionHeader(title: 'About'),
-                    _buildAboutTile(context),
-                    const SizedBox(height: 24),
+                        // About Section
+                        _SectionHeader(title: l10n.about),
+                        _buildAboutTile(context),
+                        const SizedBox(height: 24),
 
-                    // Logout Button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () => _showLogoutDialog(context),
-                          icon: const Icon(Icons.logout),
-                          label: const Text('Sign Out'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Theme.of(context).colorScheme.error,
-                            side: BorderSide(
-                              color: Theme.of(context).colorScheme.error,
+                        // Logout Button
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () => _showLogoutDialog(context),
+                              icon: const Icon(Icons.logout),
+                              label: Text(l10n.signOut),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Theme.of(context).colorScheme.error,
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                  ],
+                        const SizedBox(height: 32),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
@@ -125,6 +131,7 @@ class UserProfilePage extends StatelessWidget {
   }
 
   Widget _buildThemeTile(BuildContext context, pref) {
+    final l10n = AppLocalizations.of(context)!;
     final isDarkMode = pref.themeMode == ThemeMode.dark;
 
     return ListTile(
@@ -138,8 +145,8 @@ class UserProfilePage extends StatelessWidget {
           color: isDarkMode ? Colors.amber : const Color(0xFF004DFF),
         ),
       ),
-      title: const Text('Dark Mode'),
-      subtitle: Text(isDarkMode ? 'On' : 'Off'),
+      title: Text(l10n.darkMode),
+      subtitle: Text(isDarkMode ? l10n.on : l10n.off),
       trailing: Switch(
         value: isDarkMode,
         onChanged: (value) {
@@ -154,6 +161,7 @@ class UserProfilePage extends StatelessWidget {
   }
 
   Widget _buildLocaleTile(BuildContext context, pref) {
+    final l10n = AppLocalizations.of(context)!;
     const locales = <(String tag, String label)>[
       ('en', 'English'),
       ('ko', '한국어'),
@@ -165,7 +173,7 @@ class UserProfilePage extends StatelessWidget {
 
     return ListTile(
       leading: const Icon(Icons.language),
-      title: const Text('Language'),
+      title: Text(l10n.language),
       subtitle: Text(currentLabel),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _showLanguageDialog(context, pref.locale, locales),
@@ -173,10 +181,11 @@ class UserProfilePage extends StatelessWidget {
   }
 
   Widget _buildNotificationsTile(BuildContext context, pref) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
       leading: const Icon(Icons.notifications_outlined),
-      title: const Text('Push Notifications'),
-      subtitle: Text(pref.notificationsEnabled ? 'Enabled' : 'Disabled'),
+      title: Text(l10n.pushNotifications),
+      subtitle: Text(pref.notificationsEnabled ? l10n.enabled : l10n.disabled),
       trailing: Switch(
         value: pref.notificationsEnabled,
         onChanged: (value) {
@@ -189,10 +198,11 @@ class UserProfilePage extends StatelessWidget {
   }
 
   Widget _buildNotificationsListTile(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
       leading: const Icon(Icons.inbox_outlined),
-      title: const Text('Notification History'),
-      subtitle: const Text('View past notifications'),
+      title: Text(l10n.notificationHistory),
+      subtitle: Text(l10n.viewPastNotifications),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
         Navigator.of(context).push(NotificationsPage.route());
@@ -201,10 +211,11 @@ class UserProfilePage extends StatelessWidget {
   }
 
   Widget _buildAboutTile(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
       leading: const Icon(Icons.info_outline),
-      title: const Text('About August Chat'),
-      subtitle: const Text('Version 1.0.0'),
+      title: Text(l10n.aboutAppName),
+      subtitle: Text(l10n.version('1.0.0')),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
         showAboutDialog(
@@ -214,7 +225,7 @@ class UserProfilePage extends StatelessWidget {
           applicationLegalese: '© 2024 August Chat',
           children: [
             const SizedBox(height: 16),
-            const Text('A modern chat application built with Flutter.'),
+            Text(l10n.appDescription),
           ],
         );
       },
@@ -226,10 +237,11 @@ class UserProfilePage extends StatelessWidget {
     String currentLocale,
     List<(String, String)> locales,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Select Language'),
+        title: Text(l10n.selectLanguage),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: locales.map((locale) {
@@ -252,7 +264,7 @@ class UserProfilePage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -260,15 +272,16 @@ class UserProfilePage extends StatelessWidget {
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        title: Text(l10n.signOutConfirmTitle),
+        content: Text(l10n.signOutConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -276,7 +289,7 @@ class UserProfilePage extends StatelessWidget {
               FirebaseAuth.instance.signOut();
             },
             child: Text(
-              'Sign Out',
+              l10n.signOut,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:august_chat/chat/view/chat_page.dart';
+import 'package:august_chat/l10n/app_localizations.dart';
 import 'package:august_chat/repositories/chat_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,17 +19,19 @@ class UsersPage extends StatelessWidget {
     final repo = context.read<ChatRepository>();
     final myUid = FirebaseAuth.instance.currentUser!.uid;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocProvider(
       create: (_) => UsersBloc(repo)..add(UsersStartEvent()),
       child: Scaffold(
-        appBar: AppBar(title: const Text('Users')),
+        appBar: AppBar(title: Text(l10n.users)),
         body: BlocBuilder<UsersBloc, UsersState>(
           builder: (context, state) {
             if (state.status == UsersStatus.loading) {
               return const Center(child: CircularProgressIndicator());
             }
             if (state.status == UsersStatus.failure) {
-              return Center(child: Text(state.errorMessage ?? 'Failed to load users'));
+              return Center(child: Text(state.errorMessage ?? l10n.failedToLoadUsers));
             }
             
             return ListView.separated(

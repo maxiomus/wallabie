@@ -4,6 +4,7 @@ import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
+import 'package:august_chat/l10n/app_localizations.dart';
 import 'package:august_chat/chat/bloc/chat_bloc.dart';
 import '../../app/theme_provider.dart';
 
@@ -92,7 +93,8 @@ class _ChatPageState extends State<ChatPage> {
           body: BlocBuilder<ChatBloc, ChatState>(
             builder: (context, state) {
               if (state.status == ChatStatus.failure) {
-                return Center(child: Text(state.errorMessage ?? 'Chat error'));
+                final l10n = AppLocalizations.of(context)!;
+                return Center(child: Text(state.errorMessage ?? l10n.chatError));
               }
               if (state.status == ChatStatus.loading) {
                 return const Center(child: CircularProgressIndicator());
@@ -206,23 +208,28 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               
                               Expanded(
-                                child: TextField(
-                                  controller: _composerController,
-                                  focusNode: _composerFocus,
-                                  minLines: 1,
-                                  maxLines: 4,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Message',
-                                    border: InputBorder.none,
-                                  ),
-                                  onTap: () {
-                                    // Opening keyboard should hide emoji panel
-                                    if (_panel != InputPanel.none) {
-                                      setState(() => _panel = InputPanel.none);
-                                    }
+                                child: Builder(
+                                  builder: (context) {
+                                    final l10n = AppLocalizations.of(context)!;
+                                    return TextField(
+                                      controller: _composerController,
+                                      focusNode: _composerFocus,
+                                      minLines: 1,
+                                      maxLines: 4,
+                                      decoration: InputDecoration(
+                                        hintText: l10n.message,
+                                        border: InputBorder.none,
+                                      ),
+                                      onTap: () {
+                                        // Opening keyboard should hide emoji panel
+                                        if (_panel != InputPanel.none) {
+                                          setState(() => _panel = InputPanel.none);
+                                        }
+                                      },
+                                      onChanged: (_) => setState(() {}),
+                                      onSubmitted: (_) => _send(),
+                                    );
                                   },
-                                  onChanged: (_) => setState(() {}),
-                                  onSubmitted: (_) => _send(),
                                 ),
                               ),
                               
@@ -288,15 +295,16 @@ class _ChatPageState extends State<ChatPage> {
         );
 
       case InputPanel.attach:
+        final l10n = AppLocalizations.of(context)!;
         return SizedBox(
           height: 200,
           child: GridView.count(
             crossAxisCount: 4,
             children: [
-              _attachButton(Icons.image, 'Gallery'),
-              _attachButton(Icons.camera_alt, 'Camera'),
-              _attachButton(Icons.insert_drive_file, 'File'),
-              _attachButton(Icons.location_on, 'Location'),
+              _attachButton(Icons.image, l10n.gallery),
+              _attachButton(Icons.camera_alt, l10n.camera),
+              _attachButton(Icons.insert_drive_file, l10n.file),
+              _attachButton(Icons.location_on, l10n.location),
             ],
           ),
         );
@@ -326,8 +334,9 @@ class _ChatPageState extends State<ChatPage> {
 
   void _startVoiceRecord() {
     // TODO: Integrate record package for voice messages
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Voice recording not yet implemented')),
+      SnackBar(content: Text(l10n.voiceRecordingNotImplemented)),
     );
   }
 
