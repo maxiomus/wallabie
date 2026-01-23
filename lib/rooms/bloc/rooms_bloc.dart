@@ -83,7 +83,10 @@ class RoomsBloc extends Bloc<RoomsEvent, RoomsState> {
           }
         },
         onError: (e, st) {
-
+          emit(state.copyWith(
+            status: RoomsStatus.failure,
+            errorMessage: 'Failed to load users: ${e.toString()}',
+          ));
         }
       ),
     ]);

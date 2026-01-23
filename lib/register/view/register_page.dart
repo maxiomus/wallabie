@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:august_chat/rooms/view/rooms_page.dart';
-
 import '../register.dart';
 
 /// Registration page for creating new user accounts.

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
 
 /// {@template sign_up_with_email_and_password_failure}
@@ -213,7 +212,6 @@ class AuthRepository {
     final doc = await ref.get();
 
     if (!doc.exists) {
-       if (!doc.exists) {
       await ref.set({
         'name': user.displayName ?? 'User ${user.uid}',
         if (user.email != null) 'email': user.email,
@@ -228,7 +226,6 @@ class AuthRepository {
         if (user.displayName != null) 'name': user.displayName,
         if (user.email != null) 'email': user.email,
       }, SetOptions(merge: true));
-    }
     }
 
     return cred.user!;

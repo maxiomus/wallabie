@@ -63,14 +63,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    /*
-    final themeMode = context.select((UserProfileBloc bloc) {
-      final s = bloc.state;
-      return s.loadStatus == UserProfileLoadStatus.loaded ? s.preference.themeMode : ThemeMode.system;
-    });
-    */
-    
     ChatTheme kakaoTheme = ChatTheme.dark();
 
     if(context.watch<ThemeProvider>().themeMode == ThemeMode.light) {
@@ -333,13 +325,17 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _startVoiceRecord() {
-    // later: integrate record package
-    print('Start voice recording...');
+    // TODO: Integrate record package for voice messages
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Voice recording not yet implemented')),
+    );
   }
 
   Future<void> _sendSticker(String sticker) async {
-    final bloc = _bloc!;
-    //await bloc.sendSticker(sticker); // you implement this
+    final bloc = _bloc;
+    if (bloc == null) return;
+    // TODO: Implement sticker sending
+    // await bloc.sendSticker(sticker);
   }
 
   void _showReactionPicker(String messageId) {

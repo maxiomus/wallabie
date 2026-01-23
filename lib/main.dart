@@ -15,10 +15,6 @@ import 'package:august_chat/repositories/user_repository.dart';
 import 'package:august_chat/repositories/profile_repostory.dart';
 import 'package:august_chat/firebase_options.dart';
 import 'package:august_chat/app/view/app.dart';
-import 'package:provider/provider.dart';
-
-import 'app/theme_provider.dart';
-//import 'package:august_chat/auth/bloc/auth_bloc.dart';
 
 /// Google OAuth client ID for authentication.
 const clientId = '961092907782-6n40v5fmkc1bap5cck1uv42cjksmf2u4.apps.googleusercontent.com';
@@ -51,21 +47,19 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    /*
-    final initialBrightness =
-        WidgetsBinding.instance.platformDispatcher.platformBrightness;
-    */
-    
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(create: (context) => AuthRepository()),
         RepositoryProvider(create: (context) => ChatRepository()),
         RepositoryProvider(create: (context) => ProfileRepository()),
-        RepositoryProvider(create: (_) {
-          final repo = UserRepository();
-          repo.start();
-          return repo;
-        }),
+        RepositoryProvider<UserRepository>(
+          create: (_) {
+            final repo = UserRepository();
+            repo.start();
+            return repo;
+          },
+          dispose: (repo) => repo.dispose(),
+        ),
       ],
       
       child: App(clientId: clientId),

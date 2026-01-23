@@ -70,36 +70,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         );
       },
     );
-
-    /*
-    _sub = FirebaseFirestore.instance
-      .collection('rooms')
-      .doc(roomId)
-      .collection('messages')
-      .orderBy('createdAt', descending: true)
-      .snapshots()
-      .listen(
-      (snap) {
-        final msgs = snap.docs.map(_docToMessage).toList();
-
-        chatController.setMessages(msgs);
-
-        emit(
-          const ChatState(
-            status: ChatStatus.loaded,            
-          )
-        );
-      },
-
-      onError: (e){
-        emit(
-          ChatState(
-            status: ChatStatus.failure, 
-            errorMessage: e.toString(),
-          )
-        );
-      }); 
-      */
   }
 
   /// Converts a Firestore document to a [TextMessage].

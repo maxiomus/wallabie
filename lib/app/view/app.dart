@@ -3,8 +3,6 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:flow_builder/flow_builder.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:firebase_ui_localizations/firebase_ui_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -13,7 +11,7 @@ import 'package:august_chat/app/theme_provider.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../home/view/home_page.dart';
 import '../../repositories/profile_repostory.dart';
-import '../localeProvider.dart';
+import '../locale_provider.dart';
 import '../user_profile/bloc/user_profile_bloc.dart';
 import '../../theme.dart';
 
@@ -30,8 +28,6 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final themeProvider = context.watch<ThemeProvider>();
-
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
@@ -127,17 +123,6 @@ class AppView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final userPreference = Provider.of<UserPreference>(context);
-    //final locale = const Locale('en', 'US');
-    /*
-    final themeMode = context.select((UserProfileBloc bloc) {
-      final s = bloc.state;
-      return s.loadStatus == UserProfileLoadStatus.loaded
-          ? s.preference.themeMode
-          : ThemeMode.system;
-    });
-    */    
-
     return BlocListener<UserProfileBloc, UserProfileState>(
       listenWhen: (prev, next) =>
         prev.preference.themeMode != next.preference.themeMode &&          
@@ -167,10 +152,4 @@ class AppView extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Parses a locale tag string into a [Locale] object.
-Locale _parseLocale(String tag) {
-  final parts = tag.split(RegExp('[-_]'));
-  return parts.length == 1 ? Locale(parts[0]) : Locale(parts[0], parts[1]);
 }

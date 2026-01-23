@@ -221,4 +221,11 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
 
     add(UserProfileThemeModeChanged(next));
   }
+
+  @override
+  Future<void> close() async {
+    _debounce?.cancel();
+    await _sub?.cancel();
+    return super.close();
+  }
 }

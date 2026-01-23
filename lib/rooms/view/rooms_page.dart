@@ -2,7 +2,6 @@ import 'package:august_chat/chat/view/chat_page.dart';
 import 'package:august_chat/repositories/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:august_chat/users/view/users_page.dart';
 import 'package:august_chat/group/create_group_page.dart';
@@ -62,8 +61,6 @@ class RoomsPage extends StatelessWidget {
               return const Center(child: Text('No chats yet. Start one!'));
             }
 
-            final myUid = FirebaseAuth.instance.currentUser!.uid;
-
             return ListView.separated(
               itemCount: rooms.length,
               separatorBuilder: (_, __) => const Divider(height: 1),
@@ -73,7 +70,6 @@ class RoomsPage extends StatelessWidget {
                 // Basic label: room.name is set for groups.
                 // For 1-on-1 rooms, name can be null — you can derive from users later.                
                 final title = room.name;
-                //print('chat name $title');
                 final subtitle = room.lastMessageText;
 
                 return ListTile(
@@ -102,18 +98,5 @@ class RoomsPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _directTitleFallback(List<String> memberIds, String myUid, UserRepository repo) {
-    // Without joining users here, we can at least show "Direct chat".
-    // If you want, we can enhance this to show the other user's name by looking up users map.
-    final other = memberIds.firstWhere((id) => id != myUid, orElse: () => myUid);
-    if(other.isEmpty) return 'Direct chat';
-
-    final cached = repo.getCached(other);
-    final name = cached?.name?.trim();
-    if(name != null && name.isNotEmpty) return name;
-
-    return 'Chat';
   }
 }

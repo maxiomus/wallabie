@@ -78,14 +78,6 @@ class HomeView extends StatelessWidget {
       ),
     );
   }
-
-  String _getTitle(HomeTab tab) {
-    switch (tab) {
-      case HomeTab.users: return 'Users';
-      case HomeTab.rooms: return 'Rooms';
-      case HomeTab.options: return 'Options';      
-    }
-  }
 }
 
 class _HomeTabButton extends StatelessWidget {
