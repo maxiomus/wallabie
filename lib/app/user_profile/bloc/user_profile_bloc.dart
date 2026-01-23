@@ -36,6 +36,7 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     on<UserProfileThemeModeChanged>(_onThemeModeChanged);
     on<UserProfileThemeModeToggled>(_onThemeModeToggled);
     on<UserProfileLocaleChanged>(_onLocaleChanged);
+    on<UserProfileNotificationsToggled>(_onNotificationsToggled);
     on<UserProfilePersistRequested>(_onPersistRequested);
   }
 
@@ -166,6 +167,31 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   Future<void> _onLocaleChanged(UserProfileLocaleChanged event, Emitter<UserProfileState> emit) async {
     final updated = state.preference.copyWith(
       locale: event.locale,
+      updatedAt: DateTime.now(),
+    );
+
+    emit(state.copyWith(
+      preference: updated,
+      saveStatus: UserProfileSaveStatus.saving,
+      errorMessage: null,
+    ));
+
+    await _profileRepository.saveCached(updated);
+
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      if (!isClosed) {
+        add(UserProfilePersistRequested(updated));
+      }
+    });
+  }
+
+  Future<void> _onNotificationsToggled(
+    UserProfileNotificationsToggled event,
+    Emitter<UserProfileState> emit,
+  ) async {
+    final updated = state.preference.copyWith(
+      notificationsEnabled: !state.preference.notificationsEnabled,
       updatedAt: DateTime.now(),
     );
 

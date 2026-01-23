@@ -18,6 +18,9 @@ class UserPreference extends Equatable {
   /// User's preferred locale tag (e.g., 'en', 'ko').
   final String locale;
 
+  /// Whether push notifications are enabled.
+  final bool notificationsEnabled;
+
   /// Timestamp of the last update.
   final DateTime? updatedAt;
 
@@ -27,6 +30,7 @@ class UserPreference extends Equatable {
     this.userName = '',
     this.themeMode = ThemeMode.system,
     this.locale = 'en',
+    this.notificationsEnabled = true,
     this.updatedAt,
   });
 
@@ -36,13 +40,13 @@ class UserPreference extends Equatable {
       'userName': userName,
       'themeMode': themeMode.name,
       'locale': locale,
+      'notificationsEnabled': notificationsEnabled,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }
 
   /// Creates a [UserPreference] from a Firestore JSON map.
   factory UserPreference.fromJson(Map<String, dynamic> json, String userId) {
-    
     return UserPreference(
       userId: userId,
       userName: json['userName'] as String? ?? '',
@@ -51,6 +55,7 @@ class UserPreference extends Equatable {
         orElse: () => ThemeMode.system,
       ),
       locale: json['locale'] as String? ?? 'en',
+      notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
       updatedAt: _parseUpdatedAt(json['updatedAt']),
     );
   }
@@ -60,19 +65,21 @@ class UserPreference extends Equatable {
     String? userName,
     ThemeMode? themeMode,
     String? locale,
+    bool? notificationsEnabled,
     DateTime? updatedAt,
   }) {
     return UserPreference(
       userId: userId,
       userName: userName ?? this.userName,
-      themeMode: themeMode ?? this.themeMode,      
+      themeMode: themeMode ?? this.themeMode,
       locale: locale ?? this.locale,
+      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
   @override
-  List<Object?> get props => [userId, userName, themeMode, locale, updatedAt];
+  List<Object?> get props => [userId, userName, themeMode, locale, notificationsEnabled, updatedAt];
 }
 
 /// Parses an updatedAt field from Firestore or cache.

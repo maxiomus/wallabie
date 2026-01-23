@@ -92,3 +92,9 @@ final class UserProfileLocaleChanged extends UserProfileEvent {
   @override
   List<Object?> get props => [locale];
 }
+
+/// Event when user toggles notifications.
+final class UserProfileNotificationsToggled extends UserProfileEvent {
+  /// Creates a [UserProfileNotificationsToggled] event.
+  const UserProfileNotificationsToggled();
+}
