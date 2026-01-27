@@ -4,6 +4,7 @@ import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
+import 'package:august_chat/chat/widgets/speech_bubble.dart';
 import 'package:august_chat/l10n/app_localizations.dart';
 import 'package:august_chat/chat/bloc/chat_bloc.dart';
 import '../../app/theme_provider.dart';
@@ -119,6 +120,18 @@ class _ChatPageState extends State<ChatPage> {
                         
                         // Bubble styling
                         textMessageBuilder: (context, message, index, {required isSentByMe, groupStatus}) {
+                          // message is flutter_chat_core TextMessage
+                          final text = message.text;
+                          
+                          final showTail = groupStatus == null || groupStatus.isLast;
+                          // Screenshot behavior: tail only on FIRST message in a group                          
+                              
+                          return SpeechBubble(                            
+                            isMe: isSentByMe,
+                            text: text,
+                            showTail: showTail,
+                          );
+                          /*
                           return SimpleTextMessage(
                             message: message, // <-- TextMessage type here
                             index: index,
@@ -142,12 +155,100 @@ class _ChatPageState extends State<ChatPage> {
                               height: 1.1,
                             ),
                           );
+                          */
                         },                               
                     
                         // Avatar / grouping wrapper
                         chatMessageBuilder: (context, message, index, animation, child, {required bool isSentByMe, MessageGroupStatus? groupStatus, bool? isRemoved}) {                    
                           final showAvatar = !isSentByMe && (groupStatus == null || groupStatus.isFirst);
                     
+                          // name only on first in group
+                          final showName = !isSentByMe && (groupStatus == null || groupStatus.isFirst);
+
+                          // time only on last in group
+                          final showTime = (groupStatus == null || groupStatus.isLast);
+
+                          final timeStamp = _timeStamp(message.createdAt);
+
+                          Widget bubleWithMeta() {
+                            if (isSentByMe) {
+                              // Outgoing: [time][bubble] aligned right
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  if (showTime)
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 6, bottom: 2),
+                                      child: Text(
+                                        timeStamp,
+                                        style: const TextStyle(fontSize: 10, color: Colors.black54),
+                                      ),
+                                    ),
+
+                                  Flexible(child: child),
+                                ],
+                              );
+                            }
+
+                            // Incoming: name on top, then [bubble][time]
+                            return Row(                              
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  child: showAvatar
+                                    ? Avatar(
+                                        userId: message.authorId,
+                                        foregroundColor: Colors.black87,
+                                        backgroundColor: Colors.white,
+                                        size: 45
+                                      )
+                                  : const SizedBox.shrink(),                                                                        
+                                ),                                
+
+                                // name + bubble
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      if (showName)
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 10.0, bottom: 2.0),
+                                          child: UserName(
+                                            userId: message.authorId,
+                                            resolveUser: bloc.resolveUser,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black87,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      if (showName) const SizedBox(height: 2,), 
+
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Flexible(child: child),
+                                          if (showTime)
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 6, bottom: 2),
+                                              child: Text(
+                                                timeStamp,
+                                                style: const TextStyle(fontSize: 10, color: Colors.black54),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+
                           return GestureDetector(
                             onLongPress: () => _showReactionPicker(message.id),
                             child: ChatMessage(
@@ -157,19 +258,8 @@ class _ChatPageState extends State<ChatPage> {
                               groupStatus: groupStatus,
                               isRemoved: isRemoved,
                               //verticalPadding: 20,                  
-                              verticalGroupedPadding: 5,
-                              leadingWidget: showAvatar
-                                ? Padding(
-                                  padding: const EdgeInsets.only(right: 10),
-                                  child: Avatar(
-                                    userId: message.authorId,
-                                    foregroundColor: Colors.black87,
-                                    backgroundColor: Colors.white,
-                                    size: 40
-                                  ),
-                                )
-                              : const SizedBox(width: 50),
-                              child: child, // keeps alignment when avatar hidden,
+                              verticalGroupedPadding: 5,                              
+                              child: bubleWithMeta(), // keeps alignment when avatar hidden,
                               
                             ),
                           );
@@ -256,6 +346,14 @@ class _ChatPageState extends State<ChatPage> {
         );
       }),
     );
+  }  
+
+  String _timeStamp(DateTime? dt) {
+    if (dt == null) return '';
+
+    //final date = DateTime.fromMillisecondsSinceEpoch(dt.millisecondsSinceEpoch);
+    final format = DateFormat.jm();
+    return format.format(dt);
   }
 
   void _togglePanel(InputPanel p) {
@@ -396,5 +494,47 @@ class _ChatPageState extends State<ChatPage> {
     _composerController.dispose();
     _composerFocus.dispose();
     super.dispose();
+  }
+}
+
+class UserName extends StatelessWidget {
+  const UserName({
+    super.key,
+    required this.userId,
+    required this.resolveUser,
+    this.style,
+  });
+
+  final String userId;
+  final Future<User> Function(String userId) resolveUser;
+  final TextStyle? style;
+
+  static final Map<String, Future<User>> _cache = {}; // userId -> User
+
+  Future<User> _getUser(String userId) {
+
+    return _cache.putIfAbsent(userId, () => resolveUser(userId));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<User>(
+      future: _getUser(userId),
+      builder: (context, snapshot) {
+        final name = snapshot.data?.name;
+
+        return Text( 
+          (name == null || name.isEmpty) ? userId : name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: style ??
+            const TextStyle(
+              fontSize: 12,
+              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+            ),
+        );
+      },
+    );
   }
 }

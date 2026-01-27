@@ -24,7 +24,30 @@ class NotificationItem extends Equatable {
     required this.body,
     required this.createdAt,
     this.isRead = false,
+    this.roomId,
+    this.data,
   });
+
+  /// Creates a [NotificationItem] from Firestore data.
+  factory NotificationItem.fromFirestore(Map<String, dynamic> json) {
+    DateTime? createdAt;
+    final createdAtValue = json['createdAt'];
+    if (createdAtValue is Timestamp) {
+      createdAt = createdAtValue.toDate();
+    } else if (createdAtValue is DateTime) {
+      createdAt = createdAtValue;
+    }
+
+    return NotificationItem(
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      body: json['body'] as String? ?? '',
+      createdAt: createdAt ?? DateTime.now(),
+      isRead: json['isRead'] as bool? ?? false,
+      roomId: (json['data'] as Map<String, dynamic>?)?['roomId'] as String?,
+      data: json['data'] as Map<String, dynamic>?,
+    );
+  }
 
   /// Unique notification identifier.
   final String id;
@@ -41,6 +64,12 @@ class NotificationItem extends Equatable {
   /// Whether the notification has been read.
   final bool isRead;
 
+  /// Room ID for navigation (if this is a chat notification).
+  final String? roomId;
+
+  /// Additional notification data.
+  final Map<String, dynamic>? data;
+
   /// Creates a copy with the given fields replaced.
   NotificationItem copyWith({
     String? id,
@@ -48,6 +77,8 @@ class NotificationItem extends Equatable {
     String? body,
     DateTime? createdAt,
     bool? isRead,
+    String? roomId,
+    Map<String, dynamic>? data,
   }) {
     return NotificationItem(
       id: id ?? this.id,
@@ -55,11 +86,13 @@ class NotificationItem extends Equatable {
       body: body ?? this.body,
       createdAt: createdAt ?? this.createdAt,
       isRead: isRead ?? this.isRead,
+      roomId: roomId ?? this.roomId,
+      data: data ?? this.data,
     );
   }
 
   @override
-  List<Object?> get props => [id, title, body, createdAt, isRead];
+  List<Object?> get props => [id, title, body, createdAt, isRead, roomId, data];
 }
 
 /// State of the notifications screen.

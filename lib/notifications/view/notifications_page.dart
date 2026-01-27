@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:august_chat/l10n/app_localizations.dart';
+import 'package:august_chat/repositories/notifications_repository.dart';
+import 'package:august_chat/chat/view/chat_page.dart';
 import '../bloc/notifications_bloc.dart';
 
 /// Page displaying user notifications.
@@ -17,9 +20,12 @@ class NotificationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     return BlocProvider(
-      create: (_) => NotificationsBloc()..add(const NotificationsStarted()),
+      create: (context) => NotificationsBloc(
+        notificationsRepository: context.read<NotificationsRepository>(),
+      )..add(NotificationsStarted(userId: userId)),
       child: Scaffold(
         appBar: AppBar(
           title: Text(l10n.notifications),
@@ -31,7 +37,7 @@ class NotificationsPage extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<NotificationsBloc>()
-                        .add(const AllNotificationsMarkedAsRead());
+                        .add(AllNotificationsMarkedAsRead(userId: userId));
                   },
                   child: Text(l10n.markAllRead),
                 );
@@ -39,41 +45,61 @@ class NotificationsPage extends StatelessWidget {
             ),
           ],
         ),
-        body: BlocBuilder<NotificationsBloc, NotificationsState>(
-          builder: (context, state) {
-            if (state.status == NotificationsStatus.loading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state.status == NotificationsStatus.failure) {
-              return Center(
-                child: Text(state.errorMessage ?? l10n.failedToLoadNotifications),
-              );
-            }
-
-            final notifications = state.notifications;
-            if (notifications.isEmpty) {
-              return Center(child: Text(l10n.noNotifications));
-            }
-
-            return ListView.separated(
-              itemCount: notifications.length,
-              separatorBuilder: (context, index) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final notification = notifications[index];
-                return _NotificationTile(notification: notification);
-              },
-            );
-          },
-        ),
+        body: _NotificationsBody(userId: userId),
       ),
     );
   }
 }
 
+class _NotificationsBody extends StatelessWidget {
+  const _NotificationsBody({required this.userId});
+
+  final String userId;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return BlocBuilder<NotificationsBloc, NotificationsState>(
+      builder: (context, state) {
+        if (state.status == NotificationsStatus.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (state.status == NotificationsStatus.failure) {
+          return Center(
+            child: Text(state.errorMessage ?? l10n.failedToLoadNotifications),
+          );
+        }
+
+        final notifications = state.notifications;
+        if (notifications.isEmpty) {
+          return Center(child: Text(l10n.noNotifications));
+        }
+
+        return ListView.separated(
+          itemCount: notifications.length,
+          separatorBuilder: (context, index) => const Divider(height: 1),
+          itemBuilder: (context, index) {
+            final notification = notifications[index];
+            return _NotificationTile(
+              notification: notification,
+              userId: userId,
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
 class _NotificationTile extends StatelessWidget {
-  const _NotificationTile({required this.notification});
+  const _NotificationTile({
+    required this.notification,
+    required this.userId,
+  });
 
   final NotificationItem notification;
+  final String userId;
 
   @override
   Widget build(BuildContext context) {
@@ -110,9 +136,25 @@ class _NotificationTile extends StatelessWidget {
       ),
       onTap: () {
         if (!notification.isRead) {
-          context
-              .read<NotificationsBloc>()
-              .add(NotificationMarkedAsRead(notification.id));
+          context.read<NotificationsBloc>().add(
+                NotificationMarkedAsRead(
+                  userId: userId,
+                  notificationId: notification.id,
+                ),
+              );
+        }
+
+        // Navigate to chat if roomId is present
+        final roomId = notification.roomId;
+        if (roomId != null && roomId.isNotEmpty) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ChatPage(
+                roomId: roomId,
+                title: notification.title,
+              ),
+            ),
+          );
         }
       },
     );

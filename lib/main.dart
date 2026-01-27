@@ -6,6 +6,7 @@
 library;
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,6 +14,7 @@ import 'package:august_chat/repositories/chat_repository.dart';
 import 'package:august_chat/repositories/auth_repository.dart';
 import 'package:august_chat/repositories/user_repository.dart';
 import 'package:august_chat/repositories/profile_repostory.dart';
+import 'package:august_chat/repositories/notifications_repository.dart';
 import 'package:august_chat/firebase_options.dart';
 import 'package:august_chat/app/view/app.dart';
 
@@ -28,7 +30,15 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform
   );
 
-  runApp(const MainApp(clientId: clientId));
+  // Set up FCM background message handler
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  // Initialize notifications repository
+  final notificationsRepository = NotificationsRepository();
+  await notificationsRepository.initialize();
+  await notificationsRepository.requestPermission();
+
+  runApp(MainApp(clientId: clientId, notificationsRepository: notificationsRepository));
 }
 
 /// Root widget that provides repositories to the widget tree.
@@ -39,10 +49,18 @@ class MainApp extends StatelessWidget {
   /// Creates the main application widget.
   ///
   /// [clientId] is required for Google OAuth authentication.
-  const MainApp({super.key, required this.clientId});
+  /// [notificationsRepository] handles FCM push notifications.
+  const MainApp({
+    super.key,
+    required this.clientId,
+    required this.notificationsRepository,
+  });
 
   /// Google OAuth client ID for authentication.
   final String clientId;
+
+  /// Repository for managing push notifications.
+  final NotificationsRepository notificationsRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +78,9 @@ class MainApp extends StatelessWidget {
           },
           dispose: (repo) => repo.dispose(),
         ),
+        RepositoryProvider.value(value: notificationsRepository),
       ],
-      
+
       child: App(clientId: clientId),
     );
   }

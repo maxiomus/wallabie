@@ -284,9 +284,12 @@ class UserProfilePage extends StatelessWidget {
             child: Text(l10n.cancel),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(dialogContext).pop();
-              FirebaseAuth.instance.signOut();
+              // Delete FCM tokens before signing out to prevent
+              // notifications to signed-out devices
+              await context.read<UserProfileBloc>().deleteAllFcmTokens();
+              await FirebaseAuth.instance.signOut();
             },
             child: Text(
               l10n.signOut,

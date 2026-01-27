@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:flow_builder/flow_builder.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:firebase_ui_localizations/firebase_ui_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -13,7 +12,9 @@ import 'package:august_chat/l10n/app_localizations.dart';
 import 'package:august_chat/app/theme_provider.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../home/view/home_page.dart';
+import '../../chat/view/chat_page.dart';
 import '../../repositories/profile_repostory.dart';
+import '../../repositories/notifications_repository.dart';
 import '../locale_provider.dart';
 import '../user_profile/bloc/user_profile_bloc.dart';
 import '../../theme.dart';
@@ -102,6 +103,7 @@ class App extends StatelessWidget {
               create: (_) => UserProfileBloc(
                 user: snapshot.data!,
                 profileRepository: context.read<ProfileRepository>(),
+                notificationsRepository: context.read<NotificationsRepository>(),
               )..add(UserProfileStarted()),
             ),
             BlocProvider(create: (_) => HomeCubit()),
@@ -112,7 +114,7 @@ class App extends StatelessWidget {
               create: (_) => LocaleProvider(locale: 'en'),
             ),
           ],
-          child: AppView(),
+          child: AppView(user: snapshot.data!),
         );
       },
     );
@@ -122,9 +124,55 @@ class App extends StatelessWidget {
 /// The main application view with MaterialApp configuration.
 ///
 /// Applies theme, locale, and localization settings based on user preferences.
-class AppView extends StatelessWidget {
+/// Handles FCM notification tap navigation.
+class AppView extends StatefulWidget {
   /// Creates the [AppView] widget.
-  const AppView({super.key});
+  const AppView({super.key, required this.user});
+
+  /// The authenticated Firebase user.
+  final User user;
+
+  @override
+  State<AppView> createState() => _AppViewState();
+}
+
+class _AppViewState extends State<AppView> {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _setupNotificationHandlers();
+  }
+
+  Future<void> _setupNotificationHandlers() async {
+    final notificationsRepository = context.read<NotificationsRepository>();
+
+    // Handle notification tap when app is in background
+    notificationsRepository.onMessageOpenedApp.listen(_handleNotificationTap);
+
+    // Handle notification tap when app was terminated
+    final initialMessage = await notificationsRepository.getInitialMessage();
+    if (initialMessage != null) {
+      _handleNotificationTap(initialMessage);
+    }
+  }
+
+  void _handleNotificationTap(RemoteMessage message) {
+    final roomId = message.data['roomId'] as String?;
+    if (roomId != null && roomId.isNotEmpty) {
+      // Navigate to the chat page
+      _navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (_) => _buildChatPage(roomId),
+        ),
+      );
+    }
+  }
+
+  Widget _buildChatPage(String roomId) {
+    return ChatPage(roomId: roomId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +197,7 @@ class AppView extends StatelessWidget {
         context.read<LocaleProvider>().setLocale(state.preference.locale);
       },
       child: MaterialApp(
+        navigatorKey: _navigatorKey,
         debugShowCheckedModeBanner: false,
         theme: theme,
         darkTheme: darkTheme,
@@ -170,10 +219,4 @@ class AppView extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Parses a locale tag string into a [Locale] object.
-Locale _parseLocale(String tag) {
-  final parts = tag.split(RegExp('[-_]'));
-  return parts.length == 1 ? Locale(parts[0]) : Locale(parts[0], parts[1]);
 }

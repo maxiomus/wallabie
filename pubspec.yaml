@@ -37,6 +37,8 @@ dependencies:
   shared_preferences: ^2.5.4
   flow_builder: ^0.1.0
   intl: any
+  firebase_messaging: ^15.0.0
+  flutter_local_notifications: ^18.0.0
 
 dev_dependencies:
   flutter_test:
